@@ -1,49 +1,55 @@
-# API Contract — Skeleton v1
+# API Contract
 
-Use Moodle External Functions through core/ajax (session/sesskey), or POST to `/webservice/rest/server.php` with `wsfunction=local_microlearning_<method>`, `moodlewsrestformat=json` and an administrator-issued token. REST service access is disabled/restricted by default. Do not place tokens in URLs.
+APIs are registered in `db/services.php`. Controllers validate parameters and course capabilities; services still return `notimplemented` until their TODOs are completed.
 
-Every method accepts courseid:int. The actor comes from the Moodle session/token. Controllers validate parameter types, login/context and capabilities. TODO: Implement resource ownership, course scope and business validation in services. Services currently throw `notimplemented` deliberately.
+## Access
 
-| Method | Capability | Parameters besides courseid | Intended result |
-| --- | --- | --- | --- |
-| upload_material | uploadmaterial | draftitemid:int, title:string, materialtype:PDF/AUDIO/VIDEO | Material |
-| get_material | uploadmaterial | docid:int | Material |
-| delete_material | uploadmaterial | docid:int | {deleted:true,docid} |
-| dispatch_ai | uploadmaterial | docid:int, requestkey:string, outputs:string | Task |
-| get_task | uploadmaterial | taskid:int | Task |
-| get_workspace | reviewcontent | docid:int | Workspace |
-| save_review | reviewcontent | docid:int, revision:int, contentjson:string | Workspace |
-| publish_material | reviewcontent | docid:int, revision:int | Material |
-| get_feed | viewfeed | afterid:int (initially 0), limit:int (1..100) | {items:Material[],nextafterid:int} |
-| get_content | viewfeed | docid:int | PublishedContent |
-| get_quiz | viewfeed | quizid:int | StudentQuiz |
-| submit_quiz | viewfeed | quizid:int, requestkey:string, answersjson:string | Attempt |
-| get_attempt | viewfeed | attemptid:int | Attempt owned by the caller |
+Use core/ajax inside Moodle. REST clients POST to `<MOODLE_URL>/webservice/rest/server.php` with these body fields:
 
-The intended success envelope is `{ "datajson": "<JSON resource>" }`. Moodle REST may return exceptions with HTTP 200, so inspect exception/errorcode. TODO: Define typed external return structures after agreeing on UI payloads.
+```text
+wstoken=<authorised token>
+moodlewsrestformat=json
+wsfunction=local_microlearning_<method>
+courseid=<course ID>
+```
 
-outputs is a CSV list without duplicates: SUMMARY/QUIZ/FLASHCARDS. requestkey is 1..64 ASCII alphanumeric/hyphen/underscore characters. TODO: Store a canonical payload hash in inputhash, reject matching keys with different payloads, trim titles to 1..255 characters and enforce positive identifiers. Feed ordering is ascending document ID.
+An administrator must enable REST access first. Identity comes from Moodle. Capability names below use `local/microlearning:`.
 
-## Resource shapes
+| Method | Capability | Parameters besides courseid |
+| --- | --- | --- |
+| upload_material | uploadmaterial | draftitemid:int, title:string, materialtype:string |
+| get_material | uploadmaterial | docid:int |
+| delete_material | uploadmaterial | docid:int |
+| dispatch_ai | uploadmaterial | docid:int, requestkey:string, outputs:string |
+| get_task | uploadmaterial | taskid:int |
+| get_workspace | reviewcontent | docid:int |
+| save_review | reviewcontent | docid:int, revision:int, contentjson:string |
+| publish_material | reviewcontent | docid:int, revision:int |
+| get_feed | viewfeed | afterid:int, limit:int |
+| get_content | viewfeed | docid:int |
+| get_quiz | viewfeed | quizid:int |
+| submit_quiz | viewfeed | quizid:int, requestkey:string, answersjson:string |
+| get_attempt | viewfeed | attemptid:int |
 
-- Material: `{id,courseid,title,materialtype,status,visibility,revision,timecreated,timemodified}`; no storage URLs/paths.
-- Task: `{id,docid,status,outputs,attempts,errorcode,startedat,finishedat}`.
-- Workspace: `{document:Material,chunks:[{id,position,content,sourcestart,sourceend,summary:{id,content}|null,quizzes:[TeacherQuiz]}]}`.
-- TeacherQuiz: `{id,title,questions:[{id,position,question,explanation,answers:[{id,position,answer,iscorrect}]}]}`.
-- PublishedContent: `{document:Material,chunks:[{id,position,content,sourcestart,sourceend,summary:{id,content}|null,quizids:[int]}]}`.
-- StudentQuiz: `{id,title,questions:[{id,position,question,answers:[{id,position,answer}]}]}`; omit explanation/iscorrect before submission.
-- Attempt: `{id,quizid,score,maxscore,details:[{questid,ansid,iscorrect,explanation}],timecreated}`.
+## Payloads
 
-contentjson = `{ "chunks": [...] }`, following Workspace.chunks. The proposed MVP only edits existing text; it cannot add/delete/reparent IDs or change owner/course/task/status. TODO: Validate nested ownership and expected revision, then increment revision atomically on save/publication.
+Success uses `{ "datajson": "<JSON resource>" }`. Material responses contain metadata and revision; tasks contain status and timing; workspaces contain ordered chunks, summaries and quizzes; attempts contain score and answer details. Feed responses use `{items,nextafterid}`. Do not expose storage paths, or correctness/explanations before quiz submission. Inspect exception/errorcode even when HTTP status is 200.
 
-answersjson = `[{"questid":12,"ansid":43}]`. Each question requires one option; the option must belong to the question and the question to the published quiz. TODO: Grade one point per question on the server and commit attempts/details atomically. Repeating the same key/hash returns the original attempt. Freeze quizzes with existing attempts.
+- materialtype: PDF, AUDIO or VIDEO.
+- outputs: CSV without duplicates, such as `SUMMARY,QUIZ`; FLASHCARDS is supported by the proposed contract.
+- requestkey: 1–64 ASCII letters, digits, hyphens or underscores. Same key/payload returns the original task/attempt; changed payload is a conflict.
+- contentjson: `{"chunks":[...]}`. Edit existing text only; validate ownership and expected revision. Increment revision on save/publish.
+- answersjson: `[{"questid":12,"ansid":43}]`. Require one valid option per question; grade one point per question server-side. Save results/details together and freeze quizzes with attempts.
+- Pagination: ascending document IDs, afterid=0 initially, limit=1..100. Other IDs are positive; trimmed titles are 1..255 characters.
 
-## Worker v1
+## AI engine
 
-Proposed transport input: schema_version=1, taskid, docid, materialtype, outputs and a file supplied through authenticated transport. The external engine is maintained separately. TODO: Agree on version/document mapping and executable JSON schemas between the plugin and external engine.
+The engine is separate. TODO: Agree on authenticated transport and versioned input/output schemas using taskid/docid. Return ordered chunks, source markers and requested summaries/quizzes/flashcards. PDF markers are inclusive 1-based pages; audio/video markers are milliseconds [start,end).
 
-Expected output shape: `{schema_version:1,taskid,docid,chunks:[{position,content,sourcestart,sourceend,summary,quiz:{title,questions:[{position,question,explanation,answers:[{position,answer,iscorrect}]}]},flashcards:[]}]}`. TODO: Validate task/document/source hash, RUNNING state and schema before writing. SUMMARY requires a summary; QUIZ requires at least one question with at least two options and exactly one correct option; FLASHCARDS requires nonempty cards. Unrequested outputs must be null/empty. PDF offsets are inclusive 1-based pages; audio/video offsets are milliseconds [start,end).
+TODO: Validate output, require at least two options and one correct answer per question, then commit content/task/document states atomically. Bound retries, prevent duplicate output and keep AI calls outside database transactions.
 
-TODO: Commit all output, task SUCCEEDED and document REVIEW in one transaction. Retrying a SUCCEEDED task must not duplicate output. Do not hold transactions during AI calls. Agree on provider, transport and resource limits before integration.
+## Remaining TODOs
 
-TODO: Implement sanitised errors: invalidmaterial, invalidpayload, resourcenotfound, requestconflict, staleversion, invalidstate, processingfailed. Never expose SQL, tokens, stack traces or provider secrets.
+Implement resource ownership, validation, repositories, typed responses and sanitised errors. Add material listing/editing, task/attempt history, teacher reports and flashcard access/review. Agree on upload/output limits and error codes before integration.
+
+See [EERD Design](eerd-design.md) for the schema mapping.

@@ -57,6 +57,13 @@ The plugin initializes 13 custom tables prefixed with `mdl_local_microlearning_`
 12. **`cfgs`**: System-wide configuration parameters and prompt templates.
 13. **`logs`**: Operational execution logs for AI API calls, token usage, and latency.
 
+### EERD
+
+![AI Microlearning EERD](docs/images/EERD.png)
+
+See [EERD Design](docs/eerd-design.md) for the schema mapping and
+[API Contract](docs/api-contract.md) for the current endpoints.
+
 ---
 
 ## 3. Local Environment Setup

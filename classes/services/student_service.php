@@ -2,7 +2,7 @@
 namespace local_microlearning\services;
 defined('MOODLE_INTERNAL') || die();
 
-/** See docs/implementation-plan.md for invariants and implementation order. */
+/** See docs/api-contract.md and docs/eerd-design.md for implementation requirements. */
 class student_service {
     public function get_feed(array $params, int $actorid): array {
         // TODO: Check course access and filter PUBLISHED material by visibility.

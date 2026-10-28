@@ -2,7 +2,7 @@
 namespace local_microlearning\services;
 defined('MOODLE_INTERNAL') || die();
 
-/** See docs/implementation-plan.md for invariants and implementation order. */
+/** See docs/api-contract.md and docs/eerd-design.md for implementation requirements. */
 class material_service {
     public function upload_material(array $params, int $actorid): array {
         // TODO: Verify course access, draft ownership, a single source file, MIME/type and size limits.

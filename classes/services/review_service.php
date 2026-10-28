@@ -2,7 +2,7 @@
 namespace local_microlearning\services;
 defined('MOODLE_INTERNAL') || die();
 
-/** See docs/implementation-plan.md for invariants and implementation order. */
+/** See docs/api-contract.md and docs/eerd-design.md for implementation requirements. */
 class review_service {
     public function get_workspace(array $params, int $actorid): array {
         // TODO: Load draft chunks, summaries and quizzes for the authorised document/course.
