@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='utf-8'?>
+<XMLDB PATH="local/microlearning/db" VERSION="20261028" COMMENT="Microlearning proposed initial schema">
+  <TABLES>
+    <TABLE NAME="local_microlearning_docs" COMMENT="docs records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="courseid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="userid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="title" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="255" />
+        <FIELD NAME="materialtype" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="fileid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="READY" />
+        <FIELD NAME="visibility" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="CLASS_ONLY" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="revision" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="1" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" />
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" />
+        <KEY NAME="fileid" TYPE="foreign" FIELDS="fileid" REFTABLE="files" REFFIELDS="id" />
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_microlearning_tasks" COMMENT="tasks records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="docid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="requestedby" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="requestkey" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="64" />
+        <FIELD NAME="inputhash" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="64" />
+        <FIELD NAME="outputs" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="30" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="QUEUED" />
+        <FIELD NAME="attempts" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="errorcode" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="100" />
+        <FIELD NAME="startedat" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="finishedat" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="docid" TYPE="foreign" FIELDS="docid" REFTABLE="local_microlearning_docs" REFFIELDS="id" />
+        <KEY NAME="requestedby" TYPE="foreign" FIELDS="requestedby" REFTABLE="user" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="requester-key" UNIQUE="true" FIELDS="requestedby, requestkey" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_chunks" COMMENT="chunks records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="docid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="taskid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="position" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="sourcestart" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="sourceend" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="DRAFT" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="docid" TYPE="foreign" FIELDS="docid" REFTABLE="local_microlearning_docs" REFFIELDS="id" />
+        <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="local_microlearning_tasks" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="task-position" UNIQUE="true" FIELDS="taskid, position" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_sums" COMMENT="sums records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="chunkid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="DRAFT" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="chunkid" TYPE="foreign" FIELDS="chunkid" REFTABLE="local_microlearning_chunks" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="chunk" UNIQUE="true" FIELDS="chunkid" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_fsets" COMMENT="fsets records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="docid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="taskid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="title" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="255" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="DRAFT" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="docid" TYPE="foreign" FIELDS="docid" REFTABLE="local_microlearning_docs" REFFIELDS="id" />
+        <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="local_microlearning_tasks" REFFIELDS="id" />
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_microlearning_fcards" COMMENT="fcards records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="fsetid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="position" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="front" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="back" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="fsetid" TYPE="foreign" FIELDS="fsetid" REFTABLE="local_microlearning_fsets" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="set-position" UNIQUE="true" FIELDS="fsetid, position" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_quizzes" COMMENT="quizzes records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="chunkid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="title" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="255" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" DEFAULT="DRAFT" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="chunkid" TYPE="foreign" FIELDS="chunkid" REFTABLE="local_microlearning_chunks" REFFIELDS="id" />
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_microlearning_quests" COMMENT="quests records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="quizid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="position" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="question" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="explanation" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="quizid" TYPE="foreign" FIELDS="quizid" REFTABLE="local_microlearning_quizzes" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quiz-position" UNIQUE="true" FIELDS="quizid, position" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_ans" COMMENT="ans records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="questid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="position" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="answer" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="iscorrect" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="questid" TYPE="foreign" FIELDS="questid" REFTABLE="local_microlearning_quests" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="quest-position" UNIQUE="true" FIELDS="questid, position" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_qres" COMMENT="qres records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="quizid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="userid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="requestkey" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="64" />
+        <FIELD NAME="inputhash" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="64" />
+        <FIELD NAME="score" TYPE="number" NOTNULL="true" SEQUENCE="false" LENGTH="10" DECIMALS="5" />
+        <FIELD NAME="maxscore" TYPE="number" NOTNULL="true" SEQUENCE="false" LENGTH="10" DECIMALS="5" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="quizid" TYPE="foreign" FIELDS="quizid" REFTABLE="local_microlearning_quizzes" REFFIELDS="id" />
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="user-key" UNIQUE="true" FIELDS="userid, requestkey" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_rdet" COMMENT="rdet records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="qresid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="questid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="ansid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="iscorrect" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="qresid" TYPE="foreign" FIELDS="qresid" REFTABLE="local_microlearning_qres" REFFIELDS="id" />
+        <KEY NAME="questid" TYPE="foreign" FIELDS="questid" REFTABLE="local_microlearning_quests" REFFIELDS="id" />
+        <KEY NAME="ansid" TYPE="foreign" FIELDS="ansid" REFTABLE="local_microlearning_ans" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="attempt-question" UNIQUE="true" FIELDS="qresid, questid" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_cfgs" COMMENT="cfgs records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="name" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="100" />
+        <FIELD NAME="value" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="name" UNIQUE="true" FIELDS="name" />
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_microlearning_logs" COMMENT="logs records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" NOTNULL="true" SEQUENCE="true" LENGTH="10" />
+        <FIELD NAME="taskid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="level" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="eventcode" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="100" />
+        <FIELD NAME="tokens" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="latencyms" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" DEFAULT="0" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="local_microlearning_tasks" REFFIELDS="id" />
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
