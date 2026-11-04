@@ -103,4 +103,5 @@ See [EERD Design](docs/eerd-design.md) for the schema mapping and
 * **Scope:** Deliver published micro-learning feeds to enrolled students, process quiz submissions, calculate scores, store detailed result histories, and generate analytics for instructors.
 
 ### Module 4: External AI Engine Worker
-* **Scope:** Standalone Python microservice responsible for document parsing, chunking, LLM prompt orchestration, and returning JSON payloads to Moodle API endpoints.
+* **Target Files:** `ai_engine/`, `classes/ai/pdf_engine_client.php`, `classes/ai/output_validator.php`, `classes/task/process_material.php`
+* **Scope:** Standalone Python microservice responsible for PDF parsing (PyMuPDF + Selective Tesseract OCR), heuristic page classification, OpenCV image preprocessing, inclusive Vision+Text routing, chunking with 1-based page markers, LLM prompt orchestration via LiteLLM, and returning validated JSON payloads (`schema_version = "1.0"`) to Moodle. See [AI Engine README](ai_engine/README.md) and [AI Engine Contract](docs/ai-engine-contract.md).

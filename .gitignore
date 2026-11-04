@@ -6,3 +6,9 @@ vendor/
 *.tmp
 __pycache__/
 *.pyc
+.pytest_cache/
+.venv/
+venv/
+.env
+ai_engine/.env
+ai_engine/outputs/
