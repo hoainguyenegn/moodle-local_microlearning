@@ -1,0 +1,4 @@
+# The AI engine is a standalone Python service. It must never be served by the
+# Moodle web server (it may contain a .env file with API keys).
+Require all denied
+
