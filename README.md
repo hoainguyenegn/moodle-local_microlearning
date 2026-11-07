@@ -1,5 +1,14 @@
 # Moodle Local Plugin: AI Micro-learning (`local_microlearning`)
 
+> **Work in progress — development prototype.** This branch includes local speech
+> generation, Moodle integration and PDF/PPTX text import. External Gemini calls
+> and real-teacher voice similarity still need verification. OCR/visual slide
+> understanding, direct microphone recording, MP4 export, student publication and
+> production hardening are unfinished. Existing document/quiz services may still
+> be skeletons. The development Docker setup contains machine-specific paths;
+> adapt them before running on another computer. No production-readiness claim is made.
+
+
 An AI-enhanced Micro-learning plugin for Moodle LMS that transforms lecture documents (PDF/Video) into structured micro-content chunks, summaries, flashcards, and automated quizzes.
 
 ---
@@ -104,3 +113,20 @@ See [EERD Design](docs/eerd-design.md) for the schema mapping and
 
 ### Module 4: External AI Engine Worker
 * **Scope:** Standalone Python microservice responsible for document parsing, chunking, LLM prompt orchestration, and returning JSON payloads to Moodle API endpoints.
+## Local speech narration (items 4 and 5)
+
+The repository now includes a local Vietnamese TTS engine and a teacher narration
+workspace, separate from the unfinished document-processing skeleton above.
+Use built-in voices or an explicitly approved teacher reference, generate in the
+background, and play/download audio with slide script timestamps.
+
+See [Local speech setup and limitations](docs/local-speech.md) for Docker setup,
+Moodle settings/cron, offline operation, supported inputs and verification steps.
+
+### Import PDF/PowerPoint and draft narration
+
+Teachers can now import PDF/PPTX text and speaker notes, review the extracted
+script and pass it into local speech generation. Optional Gemini drafting is
+explicitly opt-in and disabled until server credentials are configured.
+See [slide import and external AI setup](docs/slide-import.md) for supported files,
+data sharing, costs and current limits (text only; no OCR/vision yet).

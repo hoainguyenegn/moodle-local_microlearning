@@ -1,0 +1,54 @@
+name: microlearning-demo
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: moodle
+      MYSQL_USER: moodle
+      MYSQL_PASSWORD: ${MOODLE_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8088:80"
+    volumes:
+      - /Users/vothuy/Documents/moodle:/var/www/html
+      - ./apache-private.conf:/etc/apache2/conf-enabled/microlearning-private.conf:ro
+      - ..:/var/www/html/local/microlearning:ro
+      - moodledata:/var/moodledata
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+  cron:
+    build: .
+    command: ["sh", "-c", "while true; do php /var/www/html/admin/cli/cron.php; sleep 30; done"]
+    volumes:
+      - /Users/vothuy/Documents/moodle:/var/www/html:ro
+      - ..:/var/www/html/local/microlearning:ro
+      - moodledata:/var/moodledata
+    depends_on: [web]
+  speech:
+    image: microlearning-speech:local
+    env_file: ../engine/.env
+    environment:
+      SPEECH_DATA: /data
+      HF_HOME: /models
+    volumes:
+      - speechdata:/data
+      - speechmodels:/models
+      - ../engine/app:/srv/app:ro
+    ports:
+      - "127.0.0.1:8010:8000"
+volumes:
+  database:
+  moodledata:
+  speechdata:
+  speechmodels:

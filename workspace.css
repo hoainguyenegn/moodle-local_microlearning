@@ -1,0 +1,36 @@
+/* Scoped to the plugin: Moodle navigation and accessible control labels remain intact. */
+.ml-workspace {max-width:1040px; margin:0 auto; color:#253347;}
+.ml-tabs {display:flex; gap:28px; border-bottom:1px solid #dce2e9; margin:0 0 28px; flex-wrap:wrap;}
+.ml-tab {display:block; padding:14px 0; color:#647084; border-bottom:2px solid transparent; font-weight:500; text-decoration:none;}
+.ml-tab:hover {color:#234c7d; text-decoration:none;}
+.ml-tab.is-active {color:#234c7d; border-bottom-color:#234c7d;}
+.ml-panel {border:1px solid #dce2e9; border-radius:10px; padding:28px; background:#fff; margin-bottom:24px;}
+.ml-panel-title {font-size:1.15rem; font-weight:600; margin:0 0 24px;}
+.ml-workspace .mform {margin:0;}
+.ml-workspace .mform .form-control {border-color:#cbd3de; border-radius:6px; max-width:100%;}
+.ml-workspace textarea {line-height:1.7; min-height:120px;}
+.ml-workspace .btn {border-radius:6px; font-weight:500; padding:9px 16px;}
+.ml-workspace .btn-primary {background:#234c7d; border-color:#234c7d;}
+.ml-workspace .btn-primary:hover {background:#183b65; border-color:#183b65;}
+.ml-workspace .btn-secondary {background:#f4f6f8; border-color:#dce2e9; color:#334155;}
+.ml-workspace .form-description, .ml-hint {font-size:.875rem; color:#657286; line-height:1.6;}
+.ml-workspace .form-description {margin:0;}
+.ml-workspace .fdescription {font-size:.8rem; color:#657286;}
+/* Remove ornamental required/file-drop glyphs, not inputs or validation messages. */
+.ml-workspace .fitem .text-danger .icon, .ml-workspace .fdescription .icon,
+.ml-workspace .dndupload-arrow {display:none;}
+.ml-workspace .filepicker-filelist {border:1px dashed #cbd3de; border-radius:6px; background:#fafbfc;}
+.ml-section-heading {display:flex; align-items:center; justify-content:space-between; gap:16px; margin:32px 0 16px;}
+.ml-section-heading h2 {font-size:1.15rem; margin:0; font-weight:600;}
+.ml-record {padding:22px 24px; border:1px solid #dce2e9; border-radius:10px; margin:0 0 16px; background:#fff;}
+.ml-record h3 {font-size:1rem; font-weight:600; margin:0 0 8px;}
+.ml-status {font-size:.85rem; color:#657286; margin-bottom:16px;}
+.ml-record audio {display:block; width:100%; max-width:600px; margin:16px 0;}
+.ml-record details, .ml-source {margin-top:18px; border-top:1px solid #e7ebf0; padding-top:16px;}
+.ml-record summary, .ml-source summary {font-weight:500; cursor:pointer; color:#334155;}
+.ml-record .speech-slide {padding:12px 14px; border-radius:6px; margin:8px 0 16px; line-height:1.7;}
+.ml-record .speech-seek {margin:14px 0 0; font-size:.875rem;}
+.ml-source pre {white-space:pre-wrap; font:inherit; line-height:1.65; padding:14px; background:#f6f8fa;}
+.ml-empty {padding:24px; border:1px dashed #dce2e9; border-radius:8px; color:#657286;}
+.ml-workspace a:focus-visible, .ml-workspace summary:focus-visible {outline:2px solid #234c7d; outline-offset:4px;}
+@media(max-width:600px) {.ml-panel,.ml-record{padding:18px 16px}.ml-tabs{gap:20px}.ml-tab{font-size:.9rem}.ml-section-heading{align-items:flex-start}}

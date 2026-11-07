@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<XMLDB PATH="local/microlearning/db" VERSION="20261028" COMMENT="Microlearning proposed initial schema">
+<XMLDB PATH="local/microlearning/db" VERSION="20261106" COMMENT="Microlearning proposed initial schema">
   <TABLES>
     <TABLE NAME="local_microlearning_docs" COMMENT="docs records">
       <FIELDS>
@@ -241,6 +241,45 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" />
         <KEY NAME="taskid" TYPE="foreign" FIELDS="taskid" REFTABLE="local_microlearning_tasks" REFFIELDS="id" />
       </KEYS>
+    </TABLE>
+    <TABLE NAME="local_microlearning_voices" COMMENT="Local speech synthesis records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+        <FIELD NAME="courseid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="userid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="name" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="200" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" />
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" />
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_microlearning_narrjobs" COMMENT="Local speech synthesis records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
+        <FIELD NAME="courseid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="userid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="requestkey" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="64" />
+        <FIELD NAME="title" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="200" />
+        <FIELD NAME="payload" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="voiceid" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="engineid" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="64" />
+        <FIELD NAME="status" TYPE="char" NOTNULL="true" SEQUENCE="false" LENGTH="20" />
+        <FIELD NAME="manifest" TYPE="text" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="attempts" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timecreated" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+        <FIELD NAME="timemodified" TYPE="int" NOTNULL="true" SEQUENCE="false" LENGTH="10" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" />
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" />
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="user-request" UNIQUE="true" FIELDS="userid, requestkey" />
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

@@ -1,0 +1,15 @@
+services:
+  speech:
+    build: .
+    ports:
+      - "127.0.0.1:8010:8000"
+    environment:
+      SPEECH_TOKEN: ${SPEECH_TOKEN:?Set SPEECH_TOKEN in .env}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
+    volumes:
+      - speech-data:/data
+      - speech-models:/models
+    restart: unless-stopped
+volumes:
+  speech-data:
+  speech-models:

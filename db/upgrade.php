@@ -25,5 +25,19 @@ function xmldb_local_microlearning_upgrade($oldversion) {
         // Existing manually created tables need an explicit migration after schema comparison.
         upgrade_plugin_savepoint(true, 2026102800, 'local', 'microlearning');
     }
+    if ($oldversion < 2026110600) {
+        $dbman = $DB->get_manager();
+        $file = new xmldb_file(__DIR__ . '/install.xml');
+        if (!$file->loadXMLStructure()) {
+            throw new upgrade_exception('local_microlearning', 2026110600, 'Cannot load schema');
+        }
+        foreach ($file->getStructure()->getTables() as $table) {
+            if (in_array($table->getName(), ['local_microlearning_voices', 'local_microlearning_narrjobs'])
+                    && !$dbman->table_exists($table)) {
+                $dbman->create_table($table);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2026110600, 'local', 'microlearning');
+    }
     return true;
 }

@@ -6,3 +6,10 @@ vendor/
 *.tmp
 __pycache__/
 *.pyc
+
+engine/.env
+engine/data/
+engine/.venv/
+.pytest_cache/
+
+dev/.env
